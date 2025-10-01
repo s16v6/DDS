@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Управление справочниками</h1>
+
+<div class="row">
+    <div class="col-md-3">
+        <h3>Статусы</h3>
+        <ul class="list-group">
+            {% for s in statuses %}
+            <li class="list-group-item">{{ s.name }}</li>
+            {% endfor %}
+        </ul>
+        <form method="post" action="/add_status" class="mt-3">
+            <input type="text" name="name" placeholder="Новый статус" class="form-control" required>
+            <button type="submit" class="btn btn-success mt-2">Добавить</button>
+        </form>
+    </div>
+    <div class="col-md-3">
+        <h3>Типы</h3>
+        <ul class="list-group">
+            {% for t in types %}
+            <li class="list-group-item">{{ t.name }}</li>
+            {% endfor %}
+        </ul>
+        <form method="post" action="/add_type" class="mt-3">
+            <input type="text" name="name" placeholder="Новый тип" class="form-control" required>
+            <button type="submit" class="btn btn-success mt-2">Добавить</button>
+        </form>
+    </div>
+    <div class="col-md-3">
+        <h3>Категории</h3>
+        <ul class="list-group">
+            {% for c in categories %}
+            <li class="list-group-item">{{ c.name }} ({{ c.type.name }})</li>
+            {% endfor %}
+        </ul>
+        <form method="post" action="/add_category" class="mt-3">
+            <select name="type_id" class="form-select mb-2" required>
+                {% for t in types %}
+                <option value="{{ t.id }}">{{ t.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" name="name" placeholder="Новая категория" class="form-control" required>
+            <button type="submit" class="btn btn-success mt-2">Добавить</button>
+        </form>
+    </div>
+    <div class="col-md-3">
+        <h3>Подкатегории</h3>
+        <ul class="list-group">
+            {% for s in subcategories %}
+            <li class="list-group-item">{{ s.name }} ({{ s.category.name }})</li>
+            {% endfor %}
+        </ul>
+        <form method="post" action="/add_subcategory" class="mt-3">
+            <select name="category_id" class="form-select mb-2" required>
+                {% for c in categories %}
+                <option value="{{ c.id }}">{{ c.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" name="name" placeholder="Новая подкатегория" class="form-control" required>
+            <button type="submit" class="btn btn-success mt-2">Добавить</button>
+        </form>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="/" class="btn btn-secondary">Назад</a>
+</div>
+{% endblock %}

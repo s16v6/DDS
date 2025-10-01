@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Записи ДДС</h1>
+
+<!-- Форма фильтров -->
+<form method="get" class="mb-4">
+    <div class="row g-3">
+        <div class="col-md-2">
+            <label class="form-label">Дата от</label>
+            <input type="date" name="date_from" value="{{ filters.date_from or '' }}" class="form-control">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Дата до</label>
+            <input type="date" name="date_to" value="{{ filters.date_to or '' }}" class="form-control">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Статус</label>
+            <select name="status_id" class="form-select">
+                <option value="">Все</option>
+                {% for s in statuses %}
+                <option value="{{ s.id }}" {% if filters.status_id == s.id %}selected{% endif %}>{{ s.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Тип</label>
+            <select name="type_id" class="form-select" id="filter-type">
+                <option value="">Все</option>
+                {% for t in types %}
+                <option value="{{ t.id }}" {% if filters.type_id == t.id %}selected{% endif %}>{{ t.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Категория</label>
+            <select name="category_id" class="form-select" id="filter-category">
+                <option value="">Все</option>
+                {% for c in categories %}
+                <option value="{{ c.id }}" {% if filters.category_id == c.id %}selected{% endif %}>{{ c.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Подкатегория</label>
+            <select name="subcategory_id" class="form-select" id="filter-subcategory">
+                <option value="">Все</option>
+                {% for s in subcategories %}
+                <option value="{{ s.id }}" {% if filters.subcategory_id == s.id %}selected{% endif %}>{{ s.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Фильтровать</button>
+    <a href="/" class="btn btn-secondary mt-3">Сбросить</a>
+</form>
+
+<!-- Таблица записей -->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Дата</th>
+            <th>Статус</th>
+            <th>Тип</th>
+            <th>Категория</th>
+            <th>Подкатегория</th>
+            <th>Сумма</th>
+            <th>Комментарий</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in entries %}
+        <tr>
+            <td>{{ entry.date }}</td>
+            <td>{{ entry.status.name }}</td>
+            <td>{{ entry.type.name }}</td>
+            <td>{{ entry.category.name }}</td>
+            <td>{{ entry.subcategory.name }}</td>
+            <td>{{ entry.amount }}</td>
+            <td>{{ entry.comment or '' }}</td>
+            <td>
+                <a href="/edit/{{ entry.id }}" class="btn btn-sm btn-warning">Редактировать</a>
+                <form method="post" action="/delete/{{ entry.id }}" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Удалить?')">Удалить</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+document.getElementById('filter-type').addEventListener('change', async function() {
+    const typeId = this.value;
+    if (typeId) {
+        const response = await fetch(`/api/categories/${typeId}`);
+        const cats = await response.json();
+        const catSelect = document.getElementById('filter-category');
+        catSelect.innerHTML = '<option value="">Все</option>';
+        cats.forEach(c => {
+            catSelect.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+        });
+        document.getElementById('filter-subcategory').innerHTML = '<option value="">Все</option>';
+    }
+});
+
+document.getElementById('filter-category').addEventListener('change', async function() {
+    const catId = this.value;
+    if (catId) {
+        const response = await fetch(`/api/subcategories/${catId}`);
+        const subs = await response.json();
+        const subSelect = document.getElementById('filter-subcategory');
+        subSelect.innerHTML = '<option value="">Все</option>';
+        subs.forEach(s => {
+            subSelect.innerHTML += `<option value="${s.id}">${s.name}</option>`;
+        });
+    }
+});
+</script>
+{% endblock %}

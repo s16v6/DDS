@@ -1,0 +1,5 @@
+fastapi
+uvicorn[standard]
+jinja2
+databases[sqlite]
+SQLAlchemy>=1.4
