@@ -24,7 +24,9 @@
 Клонируйте репозиторий:
 
 git clone https://github.com/s16v6/DDS.git
+
 cd dds_project
+
 Создайте виртуальное окружение:
 
 python -m venv venv
